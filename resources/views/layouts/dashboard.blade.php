@@ -26,17 +26,17 @@
                     Live Monitoring
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('employees.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
+                <a href="{{ route('dashboard.employee.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.employee.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-3.488-6.952M15 19.128v.003M15 19.128a48.47 48.47 0 01-6.364-2.464M15 19.128a48.47 48.47 0 01-2.464-6.364M15 19.128A9.375 9.375 0 0012 21a9.375 9.375 0 00-3-1.872M15 19.128a48.47 48.47 0 01-2.464-6.364M15 19.128A9.375 9.375 0 0012 21a9.375 9.375 0 00-3-1.872M12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
                     Employees
                 </a>
 
-                <a href="{{ route('dashboard.camera.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('cameras.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
+                <a href="{{ route('dashboard.camera.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('cameras.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.833-.744 1.666-1.088 2.5M15 13.5a2.25 2.25 0 01-2.25 2.25H6.75m13.5 0a2.25 2.25 0 01-2.25-2.25M6.75 15a2.25 2.25 0 002.25 2.25h.008v.008h-.008a2.25 2.25 0 01-2.25-2.25M6.75 15V6.75m9 8.25V6.75m0 0a2.25 2.25 0 012.25-2.25h.008v-.008h-.008a2.25 2.25 0 01-2.25 2.25v.008h.008a2.25 2.25 0 012.25 2.25v.008h.008a2.25 2.25 0 01-2.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25 2.25v.008h.008a2.25 2.25 0 012.25 2.25v.008h.008a2.25 2.25 0 002.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25-2.25v.008h.008a2.25 2.25 0 002.25 2.25v.008h.008a2.25 2.25 0 012.25-2.25v-.008h-.008z"/></svg>
                     Cameras
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-dark-elevated">
+                <a href="{{ route('dashboard.detection_history.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-dark-elevated">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Detection History
                 </a>

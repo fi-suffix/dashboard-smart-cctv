@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,17 +17,19 @@ Route::get('/hai', function () {
 
 
 Route::prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('/employees', function () {
-        return view('dashboard.employee.index');
-    })->name('employees.index');
+    Route::resource('employee', EmployeeController::class)->only(['index', 'create', 'store']);
 
-    Route::get('/cameras', function () {
+    Route::get('/camera', function () {
         return view('dashboard.camera.index');
-    })->name('cameras.index');
+    })->name('camera.index');
 
     Route::get('/live_monitoring', function () {
     return view('dashboard.live_monitoring.index');
     })->name('live_monitoring.index');
+
+    Route::get('/detection_history', function () {
+    return view('dashboard.detection_history.index');
+    })->name('detection_history.index');
 
     Route::get('/setting', function () {
     return view('dashboard.setting.index');
