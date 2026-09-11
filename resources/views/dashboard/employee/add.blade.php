@@ -111,6 +111,15 @@
                     <label for="position" class="block text-sm font-medium mb-1.5">Position / Role</label>
                     <input id="position" name="position" type="text" value="{{ old('position') }}" placeholder="e.g. System Architect" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
                 </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium mb-1.5">Status</label>
+                    <select id="status" name="status" required class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                        <option value="active" @selected(old('status', 'active') === 'active')>Active</option>
+                        <option value="inactive" @selected(old('status') === 'inactive')>Inactive</option>
+                    </select>
+                    @error('status') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
+                </div>
             </div>
         </div>
 
