@@ -14,22 +14,22 @@ class DashboardController extends Controller
     {
         $totalEmployees = Employee::count();
         $activeEmployees = Employee::active()->count();
-        
+
         $totalCameras = Camera::count();
-        $activeCameras = Camera::active()->count();
-        
+        $activeCameras = Camera::active()->get();
+
         $detectionsToday = DetectionLog::today()->count();
         $recognizedToday = DetectionLog::today()->recognized()->count();
         $unknownToday = DetectionLog::today()->unknown()->count();
-        
+
         $avgConfidenceToday = DetectionLog::today()->recognized()->avg('confidence') ?? 0;
-        
+
         // Recent detections
         $recentDetections = DetectionLog::with(['camera', 'employee'])
             ->latest()
             ->limit(10)
             ->get();
-        
+
         // 7-day stats for chart
         $sevenDaysAgo = now()->subDays(6)->startOfDay();
         $dailyStats = DetectionLog::selectRaw('DATE(detected_at) as date, status, COUNT(*) as count')
@@ -43,6 +43,7 @@ class DashboardController extends Controller
                 foreach ($items as $item) {
                     $result[$item->status] = $item->count;
                 }
+
                 return $result;
             })
             ->values();

@@ -27,9 +27,7 @@ class FaceRecognitionController extends Controller
 
     public function faceEmbeddings(): JsonResponse
     {
-        $employees = Employee::with(['photos' => function ($query) {
-            $query->whereNotNull('embedding');
-        }])->get();
+        $employees = Employee::with('photos')->get();
 
         $data = $employees->map(function ($employee) {
             return [

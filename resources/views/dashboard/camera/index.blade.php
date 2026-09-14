@@ -44,7 +44,7 @@
                 </div>
                 <div class="aspect-video bg-dark-bg rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
                     @if ($camera->status === 'active')
-                        <img src="{{ route('dashboard.live_monitoring.show', $camera) }}/stream" 
+                        <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream" 
                              alt="{{ $camera->name }}" 
                              class="w-full h-full object-cover"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">

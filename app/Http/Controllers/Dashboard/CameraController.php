@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Camera;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class CameraController extends Controller
@@ -44,6 +45,10 @@ class CameraController extends Controller
             'reconnect_interval' => $validated['reconnect_interval'] ?? 5,
         ]);
 
+        if ($camera->status === 'active') {
+            $this->notifyPython('start', $camera->id);
+        }
+
         return redirect()->route('dashboard.camera.index')->with('success', 'Camera added successfully.');
     }
 
@@ -69,14 +74,28 @@ class CameraController extends Controller
             'reconnect_interval' => 'nullable|integer|min:1|max:300',
         ]);
 
+        // Keep current password if blank
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        }
+
         $camera->update($validated);
+
+        // Restart stream so new config is applied
+        $this->notifyPython('stop', $camera->id);
+        if ($camera->status === 'active') {
+            $this->notifyPython('start', $camera->id);
+        }
 
         return redirect()->route('dashboard.camera.index')->with('success', 'Camera updated successfully.');
     }
 
     public function destroy(Camera $camera): RedirectResponse
     {
+        $this->notifyPython('stop', $camera->id);
+
         $camera->delete();
+
         return redirect()->route('dashboard.camera.index')->with('success', 'Camera deleted successfully.');
     }
 
@@ -86,6 +105,22 @@ class CameraController extends Controller
             'status' => $camera->status === 'active' ? 'inactive' : 'active',
         ]);
 
+        if ($camera->status === 'active') {
+            $this->notifyPython('start', $camera->id);
+        } else {
+            $this->notifyPython('stop', $camera->id);
+        }
+
         return back()->with('success', 'Camera status updated.');
+    }
+
+    private function notifyPython(string $action, int $cameraId): void
+    {
+        try {
+            $base = rtrim(env('PYTHON_SERVICE_URL', 'http://localhost:8001'), '/');
+            Http::timeout(3)->post("{$base}/cameras/{$cameraId}/{$action}");
+        } catch (\Throwable $e) {
+            logger()->warning('Failed to notify Python service: '.$e->getMessage());
+        }
     }
 }

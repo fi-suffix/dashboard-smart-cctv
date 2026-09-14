@@ -52,7 +52,7 @@
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5 relative overflow-hidden">
             <div class="relative z-10">
                 <p class="text-sm text-text-secondary mb-1">Active Cameras</p>
-                <p class="text-2xl font-semibold">{{ $activeCameras }}/{{ $totalCameras }}</p>
+                <p class="text-2xl font-semibold">{{ $activeCameras->count() }}/{{ $totalCameras }}</p>
                 <div class="mt-3 flex items-center gap-1 text-xs font-medium text-success">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
                     <span>Avg confidence: {{ number_format($avgConfidenceToday * 100, 1) }}%</span>
@@ -69,19 +69,46 @@
             <div class="flex items-center justify-between p-4 border-b border-border-subtle">
                 <div>
                     <h2 class="text-base font-semibold">Live Video Feed</h2>
-                    <p class="text-xs text-text-secondary">Select a camera from Live Monitoring</p>
+                    <p class="text-xs text-text-secondary">Preview active CCTV cameras</p>
                 </div>
                 <a href="{{ route('dashboard.live_monitoring.index') }}" class="px-3 py-1.5 text-xs font-medium text-accent-blue hover:text-accent-blue-hover">View All Cameras</a>
             </div>
-            <div class="relative aspect-video bg-dark-bg">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="text-center space-y-3">
-                        <svg class="w-12 h-12 mx-auto text-text-secondary opacity-40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
-                        <p class="text-sm text-text-secondary">No camera selected</p>
-                        <a href="{{ route('dashboard.live_monitoring.index') }}" class="inline-block px-3 py-1.5 bg-accent-blue hover:bg-accent-blue-hover text-white text-xs font-medium rounded-lg transition-colors">Go to Live Monitoring</a>
+            @if ($activeCameras->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                    @foreach ($activeCameras->take(6) as $camera)
+                        <a href="{{ route('dashboard.live_monitoring.show', $camera) }}" class="group">
+                            <div class="relative aspect-video bg-dark-bg rounded-lg overflow-hidden border border-border-subtle group-hover:border-accent-blue/40 transition-colors">
+                                <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream"
+                                     alt="{{ $camera->name }}"
+                                     class="w-full h-full object-cover"
+                                     loading="lazy"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="absolute inset-0 items-center justify-center" style="display: none;">
+                                    <div class="text-center space-y-2">
+                                        <svg class="w-8 h-8 mx-auto text-text-secondary opacity-40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
+                                        <p class="text-xs text-text-secondary">Stream offline</p>
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-1.5 left-1.5 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-dark-bg/80 backdrop-blur-sm border border-border-subtle">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                                    <span class="text-[10px] font-medium text-text-primary">{{ $camera->name }}</span>
+                                </div>
+                                <div class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-dark-bg/80 backdrop-blur-sm text-[10px] font-mono text-text-secondary" data-stream-clock></div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="relative aspect-video bg-dark-bg">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center space-y-3">
+                            <svg class="w-12 h-12 mx-auto text-text-secondary opacity-40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
+                            <p class="text-sm text-text-secondary">No active cameras</p>
+                            <a href="{{ route('dashboard.camera.create') }}" class="inline-block px-3 py-1.5 bg-accent-blue hover:bg-accent-blue-hover text-white text-xs font-medium rounded-lg transition-colors">Add Camera</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
 
         <div class="bg-dark-card border border-border-subtle rounded-xl flex flex-col">
@@ -141,6 +168,15 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const dailyStats = @json($filledStats);
+    
+    // Stream clock overlay
+    function updateStreamClocks() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.querySelectorAll('[data-stream-clock]').forEach(el => el.textContent = time);
+    }
+    setInterval(updateStreamClocks, 1000);
+    updateStreamClocks();
     
     const ctx = document.getElementById('detectionChart').getContext('2d');
     

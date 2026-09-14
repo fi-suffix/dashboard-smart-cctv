@@ -29,7 +29,7 @@
         <div class="relative aspect-video bg-dark-bg">
             @if ($camera->status === 'active')
                 <img id="camera-stream" 
-                     src="http://localhost:8001/cameras/{{ $camera->id }}/stream" 
+                     src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream" 
                      alt="{{ $camera->name }}" 
                      class="w-full h-full object-cover"
                      onerror="handleStreamError()">

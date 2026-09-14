@@ -2,7 +2,7 @@
 
 @section('title', 'Employees')
 @section('page-title', 'Employees')
-@section('timestamp', 'Oct 24, 2025 — 10:42 AM')
+@section('timestamp', now()->format('M d, Y — h:i A'))
 
 @section('content')
     <div class="bg-dark-card border border-border-subtle rounded-xl overflow-hidden">
@@ -30,7 +30,9 @@
                         <th class="px-4 py-3 font-medium">ID</th>
                         <th class="px-4 py-3 font-medium">Department</th>
                         <th class="px-4 py-3 font-medium">Status</th>
+                        <th class="px-4 py-3 font-medium">Photos</th>
                         <th class="px-4 py-3 font-medium">Recognitions</th>
+                        <th class="px-4 py-3 font-medium text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border-subtle">
@@ -38,20 +40,45 @@
                         <tr class="hover:bg-dark-elevated/30 transition-colors">
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue text-xs font-semibold">{{ collect(explode(' ', $employee->name))->map(fn ($part) => substr($part, 0, 1))->take(2)->join('') }}</div>
-                                    <span class="font-medium">{{ $employee->name }}</span>
+                                    @php $primary = $employee->primary_photo ?? $employee->photos->first(); @endphp
+                                    @if ($primary)
+                                        <img src="{{ Storage::url($primary->image_path) }}" alt="{{ $employee->name }}" class="w-9 h-9 rounded-full object-cover border border-border-subtle">
+                                    @else
+                                        <div class="w-9 h-9 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue text-xs font-semibold">{{ collect(explode(' ', $employee->name))->map(fn ($part) => substr($part, 0, 1))->take(2)->join('') }}</div>
+                                    @endif
+                                    <div>
+                                        <span class="font-medium block">{{ $employee->name }}</span>
+                                        @if ($employee->position)
+                                            <span class="text-xs text-text-secondary">{{ $employee->position }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-4 py-3 text-text-secondary">#{{ $employee->employee_code }}</td>
                             <td class="px-4 py-3 text-text-secondary">{{ $employee->department }}</td>
                             <td class="px-4 py-3">
-                                <span class="inline-flex px-2 py-0.5 rounded-full {{ $employee->status === 'active' ? 'bg-success/10 text-success' : 'bg-text-secondary/10 text-text-secondary' }} text-xs font-medium">{{ ucfirst($employee->status) }}</span>
+                                <span class="inline-flex px-2 py-0.5 rounded-full {{ $employee->status_badge_class }} text-xs font-medium">{{ ucfirst($employee->status) }}</span>
                             </td>
+                            <td class="px-4 py-3 text-text-secondary">{{ $employee->photos->count() }}</td>
                             <td class="px-4 py-3 text-text-secondary">{{ number_format($employee->recognitions) }}</td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('dashboard.employee.edit', $employee) }}" class="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-dark-elevated/50 border border-border-subtle rounded-lg transition-colors">
+                                        Edit
+                                    </a>
+                                    <form action="{{ route('dashboard.employee.destroy', $employee) }}" method="POST" class="inline" onsubmit="return confirm('Delete {{ $employee->name }}? Semua data dan foto wajahnya akan dihapus.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10 bg-dark-elevated/50 border border-border-subtle rounded-lg transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-10 text-center text-sm text-text-secondary">No employees registered yet.</td>
+                            <td colspan="7" class="px-4 py-10 text-center text-sm text-text-secondary">No employees registered yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

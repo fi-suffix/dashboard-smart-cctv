@@ -141,7 +141,7 @@
 
                     <div class="flex gap-2">
                         <span class="px-3 py-1.5 bg-dark-card border border-border-subtle rounded-lg text-xs font-medium text-text-primary hover:bg-border-subtle/20">Choose Files</span>
-                        <button type="button" class="px-3 py-1.5 bg-dark-card border border-border-subtle rounded-lg text-xs font-medium text-text-primary hover:bg-border-subtle/20">Webcam Capture</button>
+                        <button type="button" onclick="openWebcamModal()" class="px-3 py-1.5 bg-dark-card border border-border-subtle rounded-lg text-xs font-medium text-text-primary hover:bg-border-subtle/20">Webcam Capture</button>
                     </div>
                 </div>
 
@@ -190,5 +190,87 @@
                 });
             }
         }
+
+        /* ---- Webcam Capture ---- */
+        const photosInput = document.getElementById('photos');
+
+        function openWebcamModal() {
+            const modal = document.getElementById('webcam-modal');
+            modal.classList.remove('hidden');
+            startWebcam();
+        }
+
+        function closeWebcamModal() {
+            const modal = document.getElementById('webcam-modal');
+            modal.classList.add('hidden');
+            stopWebcam();
+        }
+
+        let webcamStream = null;
+
+        async function startWebcam() {
+            try {
+                const video = document.getElementById('webcam-video');
+                webcamStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+                video.srcObject = webcamStream;
+            } catch (err) {
+                alert('Tidak dapat mengakses webcam: ' + err.message);
+                closeWebcamModal();
+            }
+        }
+
+        function stopWebcam() {
+            const video = document.getElementById('webcam-video');
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+            video.srcObject = null;
+        }
+
+        async function capturePhoto() {
+            const video = document.getElementById('webcam-video');
+            const canvas = document.getElementById('webcam-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
+            const file = new File([blob], `capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+            const dt = new DataTransfer();
+            const existing = photosInput.files;
+            for (let i = 0; i < existing.length; i++) dt.items.add(existing[i]);
+            dt.items.add(file);
+            photosInput.files = dt.files;
+
+            previewImages({ target: photosInput });
+            closeWebcamModal();
+        }
     </script>
+
+    {{-- Webcam Modal --}}
+    <div id="webcam-modal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-dark-card border border-border-subtle rounded-2xl overflow-hidden w-full max-w-lg">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
+                <h3 class="text-sm font-semibold">Capture Face Photo</h3>
+                <button type="button" onclick="closeWebcamModal()" class="p-1 hover:bg-dark-elevated rounded-lg text-text-secondary hover:text-text-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="relative bg-black">
+                <video id="webcam-video" autoplay playsinline class="w-full aspect-video object-cover"></video>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none border-2 border-dashed border-accent-blue/40 rounded-xl mx-12 my-8">
+                    <span class="text-xs text-accent-blue/70 bg-dark-bg/60 px-2 py-1 rounded">Posisikan wajah di tengah</span>
+                </div>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-center gap-4">
+                <button type="button" onclick="closeWebcamModal()" class="px-5 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Cancel</button>
+                <button type="button" onclick="capturePhoto()" class="px-6 py-2 bg-accent-blue hover:bg-accent-blue-hover text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-accent-blue/20">
+                    Capture
+                </button>
+            </div>
+        </div>
+        <canvas id="webcam-canvas" class="hidden"></canvas>
+    </div>
 @endsection
