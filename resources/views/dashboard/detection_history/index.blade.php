@@ -59,19 +59,19 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="stats-cards">
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
             <p class="text-sm text-text-secondary mb-1">Total Detections</p>
-            <p class="text-2xl font-semibold" id="stat-total">-</p>
+            <p class="text-2xl font-semibold">{{ number_format($stats['total']) }}</p>
         </div>
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
             <p class="text-sm text-text-secondary mb-1">Recognized</p>
-            <p class="text-2xl font-semibold text-success" id="stat-recognized">-</p>
+            <p class="text-2xl font-semibold text-success">{{ number_format($stats['recognized']) }}</p>
         </div>
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
             <p class="text-sm text-text-secondary mb-1">Unknown</p>
-            <p class="text-2xl font-semibold text-danger" id="stat-unknown">-</p>
+            <p class="text-2xl font-semibold text-danger">{{ number_format($stats['unknown']) }}</p>
         </div>
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
             <p class="text-sm text-text-secondary mb-1">Avg Confidence</p>
-            <p class="text-2xl font-semibold" id="stat-confidence">-</p>
+            <p class="text-2xl font-semibold">{{ $stats['avg_confidence'] }}%</p>
         </div>
     </div>
 
@@ -85,6 +85,7 @@
         </div>
         <div class="relative h-64" id="detection-chart">
             <canvas id="detectionChart"></canvas>
+            <p id="chart-fallback" class="hidden absolute inset-0 items-center justify-center text-sm text-text-secondary text-center px-6">Chart library could not be loaded. Statistik tetap tampil di atas.</p>
         </div>
     </div>
 
@@ -92,29 +93,39 @@
     <div class="bg-dark-card border border-border-subtle rounded-xl overflow-hidden">
         <div class="p-4 border-b border-border-subtle">
             <h2 class="text-base font-semibold">Detection Logs</h2>
+            <p class="text-xs text-text-secondary">{{ $logs->total() }} record(s)</p>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="bg-dark-elevated/50 text-text-secondary text-xs uppercase">
                     <tr>
+                        <th class="px-4 py-3 font-medium">Snapshot</th>
                         <th class="px-4 py-3 font-medium">Time</th>
                         <th class="px-4 py-3 font-medium">Camera</th>
                         <th class="px-4 py-3 font-medium">Person</th>
                         <th class="px-4 py-3 font-medium">Status</th>
                         <th class="px-4 py-3 font-medium">Confidence</th>
-                        <th class="px-4 py-3 font-medium">Snapshot</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border-subtle" id="logs-table-body">
                     @forelse ($logs as $log)
                         <tr class="hover:bg-dark-elevated/30 transition-colors">
-                            <td class="px-4 py-3 text-text-secondary">{{ $log->detected_at->format('M d, Y H:i:s') }}</td>
+                            <td class="px-4 py-3">
+                                @if ($log->snapshot_url)
+                                    <a href="{{ $log->snapshot_url }}" target="_blank" title="Open full snapshot" class="block w-16 h-10 rounded-md overflow-hidden bg-dark-elevated border border-border-subtle hover:border-accent-blue/50 transition-colors">
+                                        <img src="{{ $log->snapshot_url }}" alt="Snapshot" class="w-full h-full object-cover" loading="lazy">
+                                    </a>
+                                @else
+                                    <span class="text-text-secondary text-xs">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-text-secondary whitespace-nowrap">{{ $log->detected_at->format('M d, Y H:i:s') }}</td>
                             <td class="px-4 py-3 text-text-secondary">{{ $log->camera->name }}</td>
                             <td class="px-4 py-3">
                                 @if ($log->employee_id)
                                     <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue text-xs font-semibold">{{ collect(explode(' ', $log->employee_name))->map(fn ($part) => substr($part, 0, 1))->take(2)->join('') }}</div>
-                                        <span class="font-medium">{{ $log->employee_name }}</span>
+                                        <div class="w-6 h-6 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue text-xs font-semibold">{{ collect(explode(' ', $log->employee_name ?? $log->employee->name))->map(fn ($part) => substr($part, 0, 1))->take(2)->join('') }}</div>
+                                        <span class="font-medium">{{ $log->employee_name ?? $log->employee->name }}</span>
                                     </div>
                                 @else
                                     <span class="text-text-secondary">Unknown Person</span>
@@ -124,13 +135,6 @@
                                 <span class="inline-flex px-2 py-0.5 rounded-full {{ $log->status_badge_class }} text-xs font-medium">{{ $log->status_label }}</span>
                             </td>
                             <td class="px-4 py-3 text-text-secondary">{{ $log->confidence_percentage }}</td>
-                            <td class="px-4 py-3">
-                                @if ($log->snapshot_path)
-                                    <a href="{{ asset('storage/' . $log->snapshot_path) }}" target="_blank" class="text-accent-blue hover:underline text-xs">View</a>
-                                @else
-                                    <span class="text-text-secondary text-xs">—</span>
-                                @endif
-                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -153,33 +157,29 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Load stats
-    async function loadStats() {
-        const params = new URLSearchParams(window.location.search);
-        const response = await fetch(`{{ route('dashboard.detection_history.stats') }}?${params.toString()}`);
-        const data = await response.json();
-        
-        document.getElementById('stat-total').textContent = data.total.toLocaleString();
-        document.getElementById('stat-recognized').textContent = data.recognized.toLocaleString();
-        document.getElementById('stat-unknown').textContent = data.unknown.toLocaleString();
-        document.getElementById('stat-confidence').textContent = data.avg_confidence + '%';
-        
-        // Update chart
-        updateChart(data.daily_stats);
-    }
+    const dailyStats = @json($stats['daily_stats']);
 
-    function updateChart(dailyStats) {
-        const ctx = document.getElementById('detectionChart').getContext('2d');
-        
+    function renderChart() {
+        const ctx = document.getElementById('detectionChart');
+        if (!ctx) return;
+
+        if (typeof window.Chart === 'undefined') {
+            ctx.style.display = 'none';
+            document.getElementById('chart-fallback').classList.remove('hidden');
+            document.getElementById('chart-fallback').classList.add('flex');
+            return;
+        }
+
         if (window.detectionChart) {
             window.detectionChart.destroy();
         }
-        
-        const labels = dailyStats.map(d => {
-            const date = new Date(d.date);
+
+        const data = dailyStats || [];
+        const labels = data.map(d => {
+            const date = new Date(d.date + 'T00:00:00');
             return date.toLocaleDateString('en-US', { weekday: 'short' });
         });
-        
+
         window.detectionChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -187,7 +187,7 @@
                 datasets: [
                     {
                         label: 'Recognized',
-                        data: dailyStats.map(d => d.recognized),
+                        data: data.map(d => d.recognized),
                         borderColor: '#2563EB',
                         backgroundColor: 'rgba(37, 99, 235, 0.1)',
                         fill: true,
@@ -197,7 +197,7 @@
                     },
                     {
                         label: 'Unknown',
-                        data: dailyStats.map(d => d.unknown),
+                        data: data.map(d => d.unknown),
                         borderColor: '#EF4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         fill: true,
@@ -235,7 +235,22 @@
         });
     }
 
-    // Load on page load
-    document.addEventListener('DOMContentLoaded', loadStats);
+    // Lazy-load chart: CDN may take a moment
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if (typeof window.Chart !== 'undefined') {
+                renderChart();
+            } else {
+                window.addEventListener('load', () => {
+                    if (typeof window.Chart !== 'undefined') {
+                        renderChart();
+                    } else {
+                        renderChart(); // shows fallback message
+                    }
+                });
+            }
+        }, 300);
+    });
 </script>
 @endpush
+@endsection

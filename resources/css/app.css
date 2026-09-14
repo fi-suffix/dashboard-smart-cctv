@@ -18,3 +18,25 @@
     --color-text-secondary: #9CA3AF;
     --color-border-subtle: rgba(255, 255, 255, 0.06);
 }
+
+/* Camera grid layout improvements */
+.camera-grid-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.camera-video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+.camera-video-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

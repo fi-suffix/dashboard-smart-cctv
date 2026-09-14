@@ -80,9 +80,9 @@
 
         <div>
             <h3 class="text-sm font-medium text-text-secondary mb-3">Snapshot</h3>
-            @if ($detectionLog->snapshot_path)
+            @if ($detectionLog->snapshot_url)
                 <div class="aspect-video bg-dark-bg rounded-lg overflow-hidden">
-                    <img src="{{ asset('storage/' . $detectionLog->snapshot_path) }}" alt="Detection snapshot" class="w-full h-full object-cover">
+                    <img src="{{ $detectionLog->snapshot_url }}" alt="Detection snapshot" class="w-full h-full object-contain">
                 </div>
             @else
                 <div class="aspect-video bg-dark-bg rounded-lg flex items-center justify-center">

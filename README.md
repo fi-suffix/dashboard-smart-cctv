@@ -1,58 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FaceGuard AI — Dashboard (Laravel)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dashboard web untuk mengelola sistem **face recognition CCTV**: CRUD kamera, CRUD karyawan (employee + foto + embedding), rekam deteksi (detection logs), live monitoring, akun admin, dan settings.
 
-## About Laravel
+Berpasangan dengan service Python di folder **`../Facial-recognition-cctv`** (lihat README-nya).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Dependensi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Komponen | Versi / Spesifikasi |
+| --- | --- |
+| PHP | ^8.3 |
+| Composer | 2.x |
+| Node.js + npm | 20+ (untuk Vite & Tailwind CSS v4) |
+| MySQL / MariaDB | database `dashboard-cctv` |
+| Service Python | FastAPI di `http://localhost:8001` (opsional tapi dibutuhkan untuk live video & embedding) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Library PHP utama (`composer.json`): `laravel/framework ^13.17`, `laravel/tinker ^3.0`.
+Dev: `laravel/pint`, `pestphp/pest`, dll.
 
-## Learning Laravel
+## Persyaratan sistem
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- git, Composer, PHP 8.3+, Node.js 20+
+- MySQL berjalan (`DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_DATABASE=dashboard-cctv`, `DB_USERNAME=root`, `DB_PASSWORD=` kosong)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Setup
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+```powershell
+cd D:\PKL-project\dashboard-face-recognition
 
-## Agentic Development
+# 1. Install dependency
+composer install
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+# 2. File konfigurasi
+Copy-Item .env.example .env
+#   -> sesuaikan DB_CONNECTION/DB_DATABASE/DB_USERNAME/DB_PASSWORD
+#   -> pastikan PYTHON_SERVICE_URL dan FACE_RECOGNITION_API_KEY terisi
 
-```bash
-composer require laravel/boost --dev
+# 3. Generate app key
+php artisan key:generate
 
-php artisan boost:install
+# 4. Migrasi database
+php artisan migrate --force
+
+# 5. Seed data
+php artisan db:seed --force                                # data contoh (employees, cameras, logs)
+php artisan db:seed --class=AdminUserSeeder --force        # akun admin pertama
+
+# 6. Frontend (Tailwind / Vite)
+npm install
+npm run build          # build produksi
+# npm run dev          # atau mode development
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Akun login default
 
-## Contributing
+| Username | Password | Role |
+| --- | --- | --- |
+| `admin` | `admin123` | Super Admin |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Segera ganti password setelah login pertama** (menu **Admin Accounts**).
 
-## Code of Conduct
+## Cara menjalankan
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Mode development gabungan (server + queue + vite):
 
-## Security Vulnerabilities
+```powershell
+composer run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Atau manual:
 
-## License
+```powershell
+# Terminal 1 - web server
+php artisan serve                     # http://localhost:8000
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Terminal 2 - vite (hanya saat development styling)
+npm run dev                           # http://localhost:5173
+```
+
+Login halaman: <http://localhost:8000/login>
+
+## Konfigurasi integrasi dengan service Python
+
+Variabel di `.env`:
+
+| Key | Nilai contoh | Fungsi |
+| --- | --- | --- |
+| `PYTHON_SERVICE_URL` | `http://localhost:8001` | Base URL service FastAPI |
+| `FACE_RECOGNITION_API_KEY` | `your-secret-api-key-here` | API key dipakai service Python untuk memanggil API Laravel |
+
+Service Python memanggil endpoint `/api/face-recognition/*` yang dilindungi middleware `api.key`
+(cek header `Authorization: Bearer <FACE_RECOGNITION_API_KEY>`). CSRF dikecualikan untuk URL tersebut di `bootstrap/app.php`.
+
+Alur:
+1. Dashboard mengirim daftar kamera aktif & embeddings karyawan (via `FaceRecognitionController`).
+2. Service Python membaca stream, mendeteksi + mengenali wajah.
+3. Python POST `detection-logs` + menyimpan snapshot ke `Facial-recognition-cctv/snapshots/`.
+
+## Snapshots
+
+Folder `public/snapshots` adalah **junction** ke `../Facial-recognition-cctv/snapshots`.
+Snapshot yang ditulis service Python otomatis bisa diakses web melalui `http://localhost:8000/snapshots/...`.
+
+Folder ini **tidak ikut git** (tidak di-commit).
+
+## Cleanup storage
+
+Halaman **Settings → Storage & Cleanup**:
+
+- Menampilkan pemakaian saat ini (jumlah log, jumlah file snapshot, total ukuran).
+- `Run Cleanup Now` menghapus:
+  - log deteksi yang lebih tua dari **retention** (default 30 hari) beserta file snapshot-nya;
+  - file snapshot *yatim* (tidak lagi direferensikan log mana pun) yang lebih tua dari **snapshot retention** (default 7 hari).
+
+Implementasi: `SettingsController@index` dan `@cleanup` (`POST /dashboard/setting/cleanup`).
+
+## Halaman utama
+
+- `/login` — login admin (email atau username)
+- `/dashboard` — ringkasan statistik
+- `/dashboard/live_monitoring/{camera}` — video live + deteksi real-time
+- `/dashboard/camera` — CRUD kamera (otomatis memulai/menghentikan stream di Python)
+- `/dashboard/employee` — CRUD karyawan + foto + embedding
+- `/dashboard/detection_history` — riwayat deteksi + filter + statistik
+- `/dashboard/admin` — kelola akun admin
+- `/dashboard/setting` — settings & cleanup storage
+
+## Struktur penting
+
+```
+routes/web.php                  # semua route dashboard + auth
+app/Http/Controllers/Auth/      # login & logout
+app/Http/Controllers/Dashboard/ # controller halaman dashboard
+app/Http/Controllers/Api/       # API untuk service Python
+app/Http/Middleware/ApiKeyAuth.php
+resources/views/auth/           # halaman login
+resources/views/dashboard/      # halaman dashboard
+resources/views/layouts/        # layout dashboard + navbar
+database/seeders/               # DatabaseSeeder + AdminUserSeeder
+public/snapshots                # junction -> ../Facial-recognition-cctv/snapshots
+```

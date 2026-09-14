@@ -51,22 +51,39 @@
 
     <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
         <h2 class="text-base font-semibold mb-4">Storage & Cleanup</h2>
-        
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium mb-1.5">Retention Period (days)</label>
-                <input type="number" id="retention-days" value="30" min="1" max="365" class="w-full max-w-xs rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
-                <p class="text-xs text-text-secondary mt-1">Auto-delete detection logs older than this</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+            <div class="bg-dark-elevated/50 border border-border-subtle rounded-lg p-4">
+                <p class="text-sm text-text-secondary mb-1">Detection Logs</p>
+                <p class="text-2xl font-semibold">{{ number_format($logCount) }}</p>
             </div>
-            
-            <div>
-                <label class="block text-sm font-medium mb-1.5">Snapshot Retention (days)</label>
-                <input type="number" id="snapshot-retention" value="7" min="1" max="90" class="w-full max-w-xs rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
-                <p class="text-xs text-text-secondary mt-1">Auto-delete snapshot images older than this</p>
+            <div class="bg-dark-elevated/50 border border-border-subtle rounded-lg p-4">
+                <p class="text-sm text-text-secondary mb-1">Snapshot Files</p>
+                <p class="text-2xl font-semibold">{{ number_format($snapshotFiles) }}</p>
             </div>
-            
-            <button class="px-4 py-2 bg-danger/10 text-danger hover:bg-danger/20 text-sm font-medium rounded-lg transition-colors">Run Cleanup Now</button>
+            <div class="bg-dark-elevated/50 border border-border-subtle rounded-lg p-4">
+                <p class="text-sm text-text-secondary mb-1">Total Size</p>
+                <p class="text-2xl font-semibold">{{ $snapshotSizeFormatted }}</p>
+            </div>
         </div>
+
+        <form method="POST" action="{{ route('dashboard.setting.cleanup') }}" onsubmit="return confirm('Jalankan cleanup sekarang? Log dan snapshot yang melampaui masa simpan akan dihapus permanen.')">
+            @csrf
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="retention_days" class="block text-sm font-medium mb-1.5">Retention Period (days)</label>
+                    <input type="number" id="retention_days" name="retention_days" value="{{ old('retention_days', 30) }}" min="1" max="365" class="w-full max-w-xs rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                    <p class="text-xs text-text-secondary mt-1">Hapus log deteksi (beserta snapshot-nya) yang lebih tua dari ini</p>
+                </div>
+                <div>
+                    <label for="snapshot_retention" class="block text-sm font-medium mb-1.5">Snapshot Retention (days)</label>
+                    <input type="number" id="snapshot_retention" name="snapshot_retention" value="{{ old('snapshot_retention', 7) }}" min="1" max="90" class="w-full max-w-xs rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                    <p class="text-xs text-text-secondary mt-1">Hapus file snapshot 'yatim' (tidak terhubung ke log mana pun) yang lebih tua dari ini</p>
+                </div>
+            </div>
+
+            <button type="submit" class="px-4 py-2 bg-danger/10 text-danger hover:bg-danger/20 text-sm font-medium rounded-lg transition-colors">Run Cleanup Now</button>
+        </form>
     </div>
 
     <div class="bg-dark-card border border-border-subtle rounded-xl p-5">

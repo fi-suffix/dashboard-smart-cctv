@@ -83,8 +83,8 @@
                     </div>
                     <div class="aspect-video bg-dark-bg rounded-lg mb-3 relative overflow-hidden group-hover:shadow-lg transition-shadow">
                         @if ($camera->status === 'active')
-                            <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream" 
-                                 alt="{{ $camera->name }}" 
+                            <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/snapshot?t={{ time() }}"
+                                 alt="{{ $camera->name }}"
                                  class="w-full h-full object-cover"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="absolute inset-0 flex items-center justify-center" style="display: none;">

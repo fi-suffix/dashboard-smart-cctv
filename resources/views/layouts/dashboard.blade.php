@@ -21,7 +21,7 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('dashboard.live_monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-dark-elevated">
+                <a href="{{ route('dashboard.live_monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.live_monitoring.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
                     Live Monitoring
                 </a>
@@ -31,17 +31,22 @@
                     Employees
                 </a>
 
-                <a href="{{ route('dashboard.camera.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('cameras.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
+                <a href="{{ route('dashboard.camera.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.camera.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.833-.744 1.666-1.088 2.5M15 13.5a2.25 2.25 0 01-2.25 2.25H6.75m13.5 0a2.25 2.25 0 01-2.25-2.25M6.75 15a2.25 2.25 0 002.25 2.25h.008v.008h-.008a2.25 2.25 0 01-2.25-2.25M6.75 15V6.75m9 8.25V6.75m0 0a2.25 2.25 0 012.25-2.25h.008v-.008h-.008a2.25 2.25 0 01-2.25 2.25v.008h.008a2.25 2.25 0 012.25 2.25v.008h.008a2.25 2.25 0 01-2.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25 2.25v.008h.008a2.25 2.25 0 012.25 2.25v.008h.008a2.25 2.25 0 002.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25-2.25v.008h.008a2.25 2.25 0 002.25 2.25v.008h.008a2.25 2.25 0 012.25-2.25v-.008h-.008z"/></svg>
                     Cameras
                 </a>
 
-                <a href="{{ route('dashboard.detection_history.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-dark-elevated">
+                <a href="{{ route('dashboard.detection_history.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.detection_history.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Detection History
                 </a>
 
-                <a href="{{ route('dashboard.setting.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-dark-elevated">
+                <a href="{{ route('dashboard.admin.index')}}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.admin.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-3.488-6.952M15 19.128v.003M15 19.128a48.47 48.47 0 01-6.364-2.464M15 19.128A9.375 9.375 0 0012 21a9.375 9.375 0 00-3-1.872M15 19.128a48.47 48.47 0 01-2.464-6.364M15 19.128A9.375 9.375 0 0012 21a9.375 9.375 0 00-3-1.872M12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
+                    Admin Accounts
+                </a>
+
+                <a href="{{ route('dashboard.setting.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard.setting.*') ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-dark-elevated' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003 1.008c-.283.29-.26.767.065 1.088l1.24.987c.328.263.45.72.3 1.12l-.72 1.152a1.125 1.125 0 01-1.587.243l-1.003-1.004a1.125 1.125 0 00-1.37.49l-1.217.456a1.125 1.125 0 01-1.075-.124 2.469 2.469 0 01-.22-.127c-.332-.184-.582-.496-.645-.87l-.213-1.281c-.09-.542-.56-.94-1.11-.94H9.594c-.55 0-1.02.398-1.11.94l-.213 1.281c-.063.374-.313.686-.645.87a2.44 2.44 0 01-.22.127c-.324.196-.72.257-1.075.124l-1.217-.456a1.125 1.125 0 01-1.37-.49L3.06 9.369a1.125 1.125 0 01.26-1.431l1.003-1.008c.283-.29.26-.767-.065-1.088l-1.24-.987c-.328-.263-.45-.72-.3-1.12l.72-1.152a1.125 1.125 0 011.587-.243l1.003 1.004a1.125 1.125 0 001.37-.49l1.217-.456c.355-.133.751-.072 1.075.124.077.044.146.087.22.127.332.184.582.496.645.87l.213 1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Settings
                 </a>
@@ -54,11 +59,17 @@
 
             <div class="p-3 border-t border-border-subtle">
                 <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-dark-elevated">
-                    <div class="w-9 h-9 rounded-full bg-accent-blue flex items-center justify-center text-white text-sm font-semibold">AK</div>
+                    <div class="w-9 h-9 rounded-full bg-accent-blue flex items-center justify-center text-white text-sm font-semibold uppercase">{{ collect(explode(' ', auth()->user()->name))->map(fn ($part) => substr($part, 0, 1))->take(2)->join('') }}</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium truncate">Alexander K.</p>
-                        <p class="text-xs text-text-secondary truncate">Security Admin</p>
+                        <p class="text-sm font-medium truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-text-secondary truncate">{{ auth()->user()->role_label }}</p>
                     </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" title="Logout" class="p-1.5 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                        </button>
+                    </form>
                 </div>
             </div>
         </aside>
@@ -89,10 +100,17 @@
             </header>
 
             <main class="p-6">
+                @if (session('success'))
+                    <div class="mb-4 p-3 rounded-lg bg-success/10 border border-success/20 text-success text-sm">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{{ session('error') }}</div>
+                @endif
                 @yield('content')
             </main>
         </div>
     </div>
     @vite('resources/js/app.js')
+    @stack('scripts')
 </body>
 </html>

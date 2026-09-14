@@ -73,4 +73,15 @@ class DetectionLog extends Model
     {
         return number_format($this->confidence * 100, 1) . '%';
     }
+
+    public function getSnapshotUrlAttribute(): ?string
+    {
+        if (empty($this->snapshot_path)) {
+            return null;
+        }
+
+        // Python saves with Windows backslashes; normalize for HTTP.
+        $path = str_replace('\\', '/', $this->snapshot_path);
+        return asset(ltrim($path, '/'));
+    }
 }

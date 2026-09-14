@@ -78,7 +78,7 @@
                     @foreach ($activeCameras->take(6) as $camera)
                         <a href="{{ route('dashboard.live_monitoring.show', $camera) }}" class="group">
                             <div class="relative aspect-video bg-dark-bg rounded-lg overflow-hidden border border-border-subtle group-hover:border-accent-blue/40 transition-colors">
-                                <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream"
+                                <img src="{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/snapshot?t={{ time() }}"
                                      alt="{{ $camera->name }}"
                                      class="w-full h-full object-cover"
                                      loading="lazy"

@@ -39,8 +39,9 @@ class DetectionLogController extends Controller
         $logs = $query->paginate(20)->withQueryString();
         $cameras = Camera::all();
         $employees = Employee::active()->get();
+        $stats = $this->statsData($request);
 
-        return view('dashboard.detection_history.index', compact('logs', 'cameras', 'employees'));
+        return view('dashboard.detection_history.index', compact('logs', 'cameras', 'employees', 'stats'));
     }
 
     public function show(DetectionLog $detectionLog): View
@@ -51,7 +52,24 @@ class DetectionLogController extends Controller
 
     public function stats(Request $request)
     {
+        return response()->json($this->statsData($request));
+    }
+
+    private function statsData(Request $request): array
+    {
         $query = DetectionLog::query();
+
+        if ($request->filled('camera_id')) {
+            $query->where('camera_id', $request->camera_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
 
         if ($request->filled('date_from')) {
             $query->whereDate('detected_at', '>=', $request->date_from);
@@ -66,10 +84,15 @@ class DetectionLogController extends Controller
         $unknown = (clone $query)->where('status', 'unknown')->count();
         $avgConfidence = (clone $query)->where('status', 'recognized')->avg('confidence') ?? 0;
 
-        // Daily stats for chart
-        $dailyStats = DetectionLog::selectRaw('DATE(detected_at) as date, status, COUNT(*) as count')
+        // Daily stats for chart (respect all active filters)
+        $dailyStats = DetectionLog::query()
+            ->selectRaw('DATE(detected_at) as date, status, COUNT(*) as count')
+            ->when($request->filled('camera_id'), fn($q) => $q->where('camera_id', $request->camera_id))
+            ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
+            ->when($request->filled('employee_id'), fn($q) => $q->where('employee_id', $request->employee_id))
             ->when($request->filled('date_from'), fn($q) => $q->whereDate('detected_at', '>=', $request->date_from))
             ->when($request->filled('date_to'), fn($q) => $q->whereDate('detected_at', '<=', $request->date_to))
+            ->where('detected_at', '>=', now()->subDays(6)->startOfDay())
             ->groupBy('date', 'status')
             ->orderBy('date')
             ->get()
@@ -80,15 +103,22 @@ class DetectionLogController extends Controller
                     $result[$item->status] = $item->count;
                 }
                 return $result;
-            })
-            ->values();
+            });
 
-        return response()->json([
+        // Fill missing days so the chart always shows the last 7 days
+        $filledStats = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $existing = $dailyStats->firstWhere('date', $date);
+            $filledStats[] = $existing ?? ['date' => $date, 'recognized' => 0, 'unknown' => 0];
+        }
+
+        return [
             'total' => $total,
             'recognized' => $recognized,
             'unknown' => $unknown,
             'avg_confidence' => round($avgConfidence * 100, 1),
-            'daily_stats' => $dailyStats,
-        ]);
+            'daily_stats' => $filledStats,
+        ];
     }
 }
