@@ -33,8 +33,15 @@
 
         <div>
             <label for="rtsp_url" class="block text-sm font-medium mb-1.5">RTSP URL</label>
-            <input id="rtsp_url" name="rtsp_url" type="text" value="{{ old('rtsp_url') }}" required placeholder="rtsp://username:password@192.168.1.100:554/stream" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
-            <p class="mt-1 text-xs text-text-secondary">RTSP stream URL (e.g., rtsp://user:pass@ip:port/stream)</p>
+            <div class="flex gap-2">
+                <input id="rtsp_url" name="rtsp_url" type="text" value="{{ old('rtsp_url') }}" required placeholder="rtsp://username:password@192.168.1.100:554/stream" class="flex-1 rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                <button type="button" id="btn-test-connection" class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-dark-elevated border border-border-subtle text-text-primary hover:border-accent-blue/50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.652a3.75 3.75 0 010-5.304m5.304 0a3.75 3.75 0 010 5.304m-7.425 2.121a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788"/></svg>
+                    Test Connection
+                </button>
+            </div>
+            <div id="test-result" class="hidden mt-2 text-sm rounded-lg p-3"></div>
+            <p class="mt-1 text-xs text-text-secondary">Test URL & kredensial sebelum disimpan. URL RTSP harus bisa dijangkau dari PC ini (satu jaringan/VPN).</p>
             @error('rtsp_url') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
         </div>
 
@@ -80,4 +87,8 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<x-camera-test-connection-script />
+@endpush
 @endsection

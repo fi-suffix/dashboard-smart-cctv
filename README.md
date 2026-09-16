@@ -119,7 +119,7 @@ Implementasi: `SettingsController@index` dan `@cleanup` (`POST /dashboard/settin
 - `/login` — login admin (email atau username)
 - `/dashboard` — ringkasan statistik
 - `/dashboard/live_monitoring/{camera}` — video live + deteksi real-time
-- `/dashboard/camera` — CRUD kamera (otomatis memulai/menghentikan stream di Python)
+- `/dashboard/camera` — CRUD kamera (otomatis memulai/menghentikan stream di Python); halaman create/edit punya tombol **Test Connection** untuk memverifikasi URL & kredensial RTSP (probe ke Python `/test-rtsp`, timeout 25 detik)
 - `/dashboard/employee` — CRUD karyawan + foto + embedding
 - `/dashboard/detection_history` — riwayat deteksi + filter + statistik
 - `/dashboard/admin` — kelola akun admin
