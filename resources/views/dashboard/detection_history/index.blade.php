@@ -76,18 +76,7 @@
     </div>
 
     {{-- Chart --}}
-    <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-base font-semibold">7-Day Detection Activity</h2>
-                <p class="text-xs text-text-secondary">Daily recognized vs unknown detections</p>
-            </div>
-        </div>
-        <div class="relative h-64" id="detection-chart">
-            <canvas id="detectionChart"></canvas>
-            <p id="chart-fallback" class="hidden absolute inset-0 items-center justify-center text-sm text-text-secondary text-center px-6">Chart library could not be loaded. Statistik tetap tampil di atas.</p>
-        </div>
-    </div>
+    @include('dashboard.partials.detection-chart', ['stats' => $stats['daily_stats']])
 
     {{-- Detection Logs Table --}}
     <div class="bg-dark-card border border-border-subtle rounded-xl overflow-hidden">
@@ -155,102 +144,7 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const dailyStats = @json($stats['daily_stats']);
-
-    function renderChart() {
-        const ctx = document.getElementById('detectionChart');
-        if (!ctx) return;
-
-        if (typeof window.Chart === 'undefined') {
-            ctx.style.display = 'none';
-            document.getElementById('chart-fallback').classList.remove('hidden');
-            document.getElementById('chart-fallback').classList.add('flex');
-            return;
-        }
-
-        if (window.detectionChart) {
-            window.detectionChart.destroy();
-        }
-
-        const data = dailyStats || [];
-        const labels = data.map(d => {
-            const date = new Date(d.date + 'T00:00:00');
-            return date.toLocaleDateString('en-US', { weekday: 'short' });
-        });
-
-        window.detectionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Recognized',
-                        data: data.map(d => d.recognized),
-                        borderColor: '#2563EB',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                    },
-                    {
-                        label: 'Unknown',
-                        data: data.map(d => d.unknown),
-                        borderColor: '#EF4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#94a3b8',
-                            font: { size: 11 },
-                            usePointStyle: true,
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#64748b', font: { size: 10 } }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255,255,255,0.06)' },
-                        ticks: { color: '#64748b', font: { size: 10 } }
-                    }
-                }
-            }
-        });
-    }
-
-    // Lazy-load chart: CDN may take a moment
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            if (typeof window.Chart !== 'undefined') {
-                renderChart();
-            } else {
-                window.addEventListener('load', () => {
-                    if (typeof window.Chart !== 'undefined') {
-                        renderChart();
-                    } else {
-                        renderChart(); // shows fallback message
-                    }
-                });
-            }
-        }, 300);
-    });
 </script>
 @endpush
 @endsection

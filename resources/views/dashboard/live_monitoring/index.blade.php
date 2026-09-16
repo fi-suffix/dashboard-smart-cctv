@@ -14,7 +14,7 @@
                 <p class="text-2xl font-semibold">{{ $stats['total_cameras'] }}</p>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-accent-blue opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.833-.744 1.666-1.088 2.5M15 13.5a2.25 2.25 0 01-2.25 2.25H6.75m13.5 0a2.25 2.25 0 01-2.25-2.25M6.75 15a2.25 2.25 0 002.25 2.25h.008v.008h-.008a2.25 2.25 0 01-2.25-2.25M6.75 15V6.75m9 8.25V6.75m0 0a2.25 2.25 0 012.25-2.25h.008v-.008h-.008a2.25 2.25 0 01-2.25 2.25v.008h.008a2.25 2.25 0 002.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25 2.25v.008h.008a2.25 2.25 0 01-2.25-2.25v-.008h-.008z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h7.5a2.25 2.25 0 012.25 2.25v.379l3.006-1.504A1.5 1.5 0 0121.75 6.96v7.08a1.5 1.5 0 01-2.244 1.314L16.5 13.85v.9A2.25 2.25 0 0114.25 17h-7.5a2.25 2.25 0 01-2.25-2.25v-8z"/></svg>
             </div>
         </div>
 
@@ -24,7 +24,7 @@
                 <p class="text-2xl font-semibold text-success">{{ $stats['active_cameras'] }}</p>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-success opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M2.25 12a9.75 9.75 0 1019.5 0 9.75 9.75 0 00-19.5 0zm5.25-.75A1.5 1.5 0 119 9.75v4.5a1.5 1.5 0 11-3 0v-3zm6 0a1.5 1.5 0 113 0v3a1.5 1.5 0 11-3 0v-3z" clip-rule="evenodd"/></svg>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
                 <p class="text-2xl font-semibold">{{ $stats['total_employees'] }}</p>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-accent-blue opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.25a8.25 8.25 0 0114.997 0"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 19.5a3 3 0 00-6 0m9-9a3 3 0 11-6 0 3 3 0 016 0zm-8.25 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zM3 19.5a3 3 0 015.25-1.98"/></svg>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-success opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 19.5a2.25 2.25 0 01-2.25-2.25V6A2.25 2.25 0 014.5 3.75h4.5a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25h-.75v4.5h.75a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25H4.5z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.75 5.25A2.25 2.25 0 016 3h8.25a2.25 2.25 0 012.25 2.25v.379l3.006-1.504A1.5 1.5 0 0121.75 5.46v8.58a1.5 1.5 0 01-2.244 1.314L16.5 13.85v.9A2.25 2.25 0 0114.25 17H6a2.25 2.25 0 01-2.25-2.25v-9.5z"/></svg>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-lg bg-dark-card flex items-center justify-center text-text-secondary">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.833-.744 1.666-1.088 2.5M15 13.5a2.25 2.25 0 01-2.25 2.25H6.75m13.5 0a2.25 2.25 0 01-2.25-2.25M6.75 15a2.25 2.25 0 002.25 2.25h.008v.008h-.008a2.25 2.25 0 01-2.25-2.25M6.75 15V6.75m9 8.25V6.75m0 0a2.25 2.25 0 012.25-2.25h.008v-.008h-.008a2.25 2.25 0 01-2.25 2.25v.008h.008a2.25 2.25 0 002.25-2.25v-.008h-.008a2.25 2.25 0 00-2.25 2.25v.008h.008a2.25 2.25 0 01-2.25-2.25v-.008h-.008z"/></svg>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75A2.25 2.25 0 016 4.5h8.25a2.25 2.25 0 012.25 2.25v.379l3.006-1.504A1.5 1.5 0 0121.75 6.96v7.08a1.5 1.5 0 01-2.244 1.314L16.5 13.85v.9A2.25 2.25 0 0114.25 17H6a2.25 2.25 0 01-2.25-2.25v-8z"/></svg>
                             </div>
                             <div>
                                 <p class="text-sm font-medium group-hover:text-accent-blue transition-colors">{{ $camera->name }}</p>
