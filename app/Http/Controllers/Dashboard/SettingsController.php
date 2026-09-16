@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\DetectionLog;
+use App\Models\Setting;
 use FilesystemIterator;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -30,11 +31,48 @@ class SettingsController extends Controller
             $snapshotBytes += $file->getSize();
         }
 
+        $faceRecognition = Setting::getGroup('face_recognition');
+        $cameraDefaults = Setting::getGroup('camera_defaults');
+        $apiIntegration = Setting::getGroup('api_integration');
+
         return view('dashboard.setting.index', [
             'logCount' => $logCount,
             'snapshotFiles' => $snapshotFiles,
             'snapshotSizeFormatted' => $this->formatBytes($snapshotBytes),
+            'faceRecognition' => $faceRecognition,
+            'cameraDefaults' => $cameraDefaults,
+            'apiIntegration' => $apiIntegration,
         ]);
+    }
+
+    public function save(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'face_recognition.threshold' => 'nullable|numeric|between:0.3,0.9',
+            'face_recognition.min_face_size' => 'nullable|integer|between:20,100',
+            'face_recognition.frame_rate' => 'nullable|integer|between:1,30',
+            'camera_defaults.reconnect_interval' => 'nullable|integer|between:1,300',
+            'camera_defaults.default_status' => 'nullable|string|in:active,inactive,maintenance',
+            'api_integration.python_service_url' => 'nullable|string|max:255',
+            'api_integration.api_key' => 'nullable|string|max:255',
+        ]);
+
+        foreach ($validated as $group => $settings) {
+            foreach ($settings as $key => $value) {
+                $fullKey = "{$group}.{$key}";
+                $existing = Setting::where('key', $fullKey)->first();
+                if ($existing) {
+                    $existing->update(['value' => $value]);
+                }
+            }
+        }
+
+        // Update .env for API integration if changed
+        if (isset($validated['api_integration'])) {
+            $this->updateEnvFile($validated['api_integration']);
+        }
+
+        return back()->with('success', 'Settings saved successfully.');
     }
 
     public function cleanup(Request $request)
@@ -93,6 +131,21 @@ class SettingsController extends Controller
             $filesDeleted,
             $this->formatBytes($bytesFreed)
         ));
+    }
+
+    private function updateEnvFile(array $apiSettings): void
+    {
+        $envPath = base_path('.env');
+        $content = file_get_contents($envPath);
+
+        if (isset($apiSettings['python_service_url'])) {
+            $content = preg_replace('/^PYTHON_SERVICE_URL=.*/m', 'PYTHON_SERVICE_URL=' . $apiSettings['python_service_url'], $content);
+        }
+        if (isset($apiSettings['api_key'])) {
+            $content = preg_replace('/^FACE_RECOGNITION_API_KEY=.*/m', 'FACE_RECOGNITION_API_KEY=' . $apiSettings['api_key'], $content);
+        }
+
+        file_put_contents($envPath, $content);
     }
 
     private function snapshotFiles(): iterable

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\EmployeePhoto;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -151,8 +152,8 @@ class EmployeeController extends Controller
     private function extractEmbedding(string $filePath): ?array
     {
         try {
-            $pythonServiceUrl = env('PYTHON_SERVICE_URL', 'http://localhost:8001');
-            $apiKey = env('FACE_RECOGNITION_API_KEY', '');
+            $pythonServiceUrl = Setting::getValue('api_integration.python_service_url', env('PYTHON_SERVICE_URL', 'http://localhost:8001'));
+            $apiKey = Setting::getValue('api_integration.api_key', env('FACE_RECOGNITION_API_KEY', ''));
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer '.$apiKey,
@@ -176,8 +177,8 @@ class EmployeeController extends Controller
     private function reloadEmbeddings(): void
     {
         try {
-            $pythonServiceUrl = env('PYTHON_SERVICE_URL', 'http://localhost:8001');
-            $apiKey = env('FACE_RECOGNITION_API_KEY', '');
+            $pythonServiceUrl = Setting::getValue('api_integration.python_service_url', env('PYTHON_SERVICE_URL', 'http://localhost:8001'));
+            $apiKey = Setting::getValue('api_integration.api_key', env('FACE_RECOGNITION_API_KEY', ''));
 
             Http::withHeaders([
                 'Authorization' => 'Bearer '.$apiKey,

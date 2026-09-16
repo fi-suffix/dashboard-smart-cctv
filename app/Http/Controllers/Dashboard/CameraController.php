@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camera;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -20,11 +21,13 @@ class CameraController extends Controller
 
     public function create(): View
     {
-        return view('dashboard.camera.create');
+        $defaults = Setting::getGroup('camera_defaults');
+        return view('dashboard.camera.create', compact('defaults'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $defaults = Setting::getGroup('camera_defaults');
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'rtsp_url' => 'required|string|max:500',
@@ -39,10 +42,10 @@ class CameraController extends Controller
             'name' => $validated['name'],
             'rtsp_url' => $validated['rtsp_url'],
             'location' => $validated['location'],
-            'status' => $validated['status'],
+            'status' => $validated['status'] ?? $defaults['default_status'] ?? 'active',
             'username' => $validated['username'] ?? null,
             'password' => $validated['password'] ?? null,
-            'reconnect_interval' => $validated['reconnect_interval'] ?? 5,
+            'reconnect_interval' => $validated['reconnect_interval'] ?? $defaults['reconnect_interval'] ?? 5,
         ]);
 
         if ($camera->status === 'active') {
@@ -117,7 +120,7 @@ class CameraController extends Controller
     private function notifyPython(string $action, int $cameraId): void
     {
         try {
-            $base = rtrim(env('PYTHON_SERVICE_URL', 'http://localhost:8001'), '/');
+            $base = rtrim(Setting::getValue('api_integration.python_service_url', env('PYTHON_SERVICE_URL', 'http://localhost:8001')), '/');
             Http::timeout(3)->post("{$base}/cameras/{$cameraId}/{$action}");
         } catch (\Throwable $e) {
             logger()->warning('Failed to notify Python service: '.$e->getMessage());
