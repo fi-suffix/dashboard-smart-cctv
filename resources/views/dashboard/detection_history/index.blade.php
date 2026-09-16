@@ -145,6 +145,90 @@
 
 @push('scripts')
 <script>
+    const dailyStats = @json($stats['daily_stats']);
+
+    function renderChart() {
+        const canvas = document.getElementById('detectionChart');
+        if (!canvas) return;
+
+        if (typeof window.Chart === 'undefined') {
+            canvas.style.display = 'none';
+            const fallback = document.getElementById('chart-fallback');
+            if (fallback) {
+                fallback.classList.remove('hidden');
+                fallback.classList.add('flex');
+            }
+            return;
+        }
+
+        if (window.detectionChart) {
+            window.detectionChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const data = dailyStats || [];
+        const labels = data.map(d => {
+            const date = new Date(d.date);
+            return date.toLocaleDateString('en-US', { weekday: 'short' });
+        });
+
+        window.detectionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Recognized',
+                        data: data.map(d => d.recognized),
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'Unknown',
+                        data: data.map(d => d.unknown),
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { size: 11 },
+                            usePointStyle: true,
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#64748b', font: { size: 10 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.06)' },
+                        ticks: { color: '#64748b', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Render on DOM ready (like dashboard)
+    document.addEventListener('DOMContentLoaded', renderChart);
 </script>
 @endpush
 @endsection

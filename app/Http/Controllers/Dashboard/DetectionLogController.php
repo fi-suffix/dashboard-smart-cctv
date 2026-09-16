@@ -84,14 +84,9 @@ class DetectionLogController extends Controller
         $unknown = (clone $query)->where('status', 'unknown')->count();
         $avgConfidence = (clone $query)->where('status', 'recognized')->avg('confidence') ?? 0;
 
-        // Daily stats for chart (respect all active filters)
+        // Daily stats for chart (last 7 days, NO filters - like dashboard)
         $dailyStats = DetectionLog::query()
             ->selectRaw('DATE(detected_at) as date, status, COUNT(*) as count')
-            ->when($request->filled('camera_id'), fn($q) => $q->where('camera_id', $request->camera_id))
-            ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
-            ->when($request->filled('employee_id'), fn($q) => $q->where('employee_id', $request->employee_id))
-            ->when($request->filled('date_from'), fn($q) => $q->whereDate('detected_at', '>=', $request->date_from))
-            ->when($request->filled('date_to'), fn($q) => $q->whereDate('detected_at', '<=', $request->date_to))
             ->where('detected_at', '>=', now()->subDays(6)->startOfDay())
             ->groupBy('date', 'status')
             ->orderBy('date')
