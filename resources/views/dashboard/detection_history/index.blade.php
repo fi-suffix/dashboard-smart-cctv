@@ -160,13 +160,16 @@
     const dailyStats = @json($stats['daily_stats']);
 
     function renderChart() {
-        const ctx = document.getElementById('detectionChart');
-        if (!ctx) return;
+        const canvas = document.getElementById('detectionChart');
+        if (!canvas) return;
 
         if (typeof window.Chart === 'undefined') {
-            ctx.style.display = 'none';
-            document.getElementById('chart-fallback').classList.remove('hidden');
-            document.getElementById('chart-fallback').classList.add('flex');
+            canvas.style.display = 'none';
+            const fallback = document.getElementById('chart-fallback');
+            if (fallback) {
+                fallback.classList.remove('hidden');
+                fallback.classList.add('flex');
+            }
             return;
         }
 
@@ -174,9 +177,10 @@
             window.detectionChart.destroy();
         }
 
+        const ctx = canvas.getContext('2d');
         const data = dailyStats || [];
         const labels = data.map(d => {
-            const date = new Date(d.date + 'T00:00:00');
+            const date = new Date(d.date);
             return date.toLocaleDateString('en-US', { weekday: 'short' });
         });
 
@@ -235,22 +239,8 @@
         });
     }
 
-    // Lazy-load chart: CDN may take a moment
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            if (typeof window.Chart !== 'undefined') {
-                renderChart();
-            } else {
-                window.addEventListener('load', () => {
-                    if (typeof window.Chart !== 'undefined') {
-                        renderChart();
-                    } else {
-                        renderChart(); // shows fallback message
-                    }
-                });
-            }
-        }, 300);
-    });
+    // Render on DOM ready (like dashboard)
+    document.addEventListener('DOMContentLoaded', renderChart);
 </script>
 @endpush
 @endsection
