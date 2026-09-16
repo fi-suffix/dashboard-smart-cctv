@@ -131,7 +131,7 @@
 
 @push('scripts')
 <script>
-    const streamUrl = "{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/snapshot";
+    const streamUrl = "{{ $pythonServiceUrl }}/cameras/{{ $camera->id }}/stream";
 
     function loadStream() {
         const img = document.getElementById('camera-stream');
@@ -184,9 +184,6 @@
     }
     setInterval(updateTime, 1000);
     updateTime();
-
-    // Poll snapshot every 500ms for near-realtime playback
-    setInterval(loadStream, 500);
 
     // Auto-retry when offline
     setInterval(() => {

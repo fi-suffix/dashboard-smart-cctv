@@ -76,18 +76,7 @@
     </div>
 
     {{-- Chart --}}
-    <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-base font-semibold">7-Day Detection Activity</h2>
-                <p class="text-xs text-text-secondary">Daily recognized vs unknown detections</p>
-            </div>
-        </div>
-        <div class="relative h-64" id="detection-chart">
-            <canvas id="detectionChart"></canvas>
-            <p id="chart-fallback" class="hidden absolute inset-0 items-center justify-center text-sm text-text-secondary text-center px-6">Chart library could not be loaded. Statistik tetap tampil di atas.</p>
-        </div>
-    </div>
+    @include('dashboard.partials.detection-chart', ['stats' => $stats['daily_stats']])
 
     {{-- Detection Logs Table --}}
     <div class="bg-dark-card border border-border-subtle rounded-xl overflow-hidden">
@@ -155,7 +144,6 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const dailyStats = @json($stats['daily_stats']);
 

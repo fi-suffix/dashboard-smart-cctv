@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-accent-blue opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.25a8.25 8.25 0 0114.997 0"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 19.5a3 3 0 00-6 0m9-9a3 3 0 11-6 0 3 3 0 016 0zm-8.25 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zM3 19.5a3 3 0 015.25-1.98"/></svg>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-success opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 19.5a2.25 2.25 0 01-2.25-2.25V6A2.25 2.25 0 014.5 3.75h4.5a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25h-.75v4.5h.75a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25H4.5z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-2.19a.75.75 0 10-1.22-.88l-3.64 5.04-1.9-1.9a.75.75 0 00-1.06 1.06l2.5 2.5a.75.75 0 001.14-.09l4.18-5.73z" clip-rule="evenodd"/></svg>
             </div>
         </div>
 
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="absolute -right-3 -top-3 w-20 h-20 text-danger opacity-20">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zm-2.25 6a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0zM7.5 17.25a4.5 4.5 0 019 0H7.5z" clip-rule="evenodd"/><path d="M18.75 3.75a.75.75 0 011.5 0v3a.75.75 0 01-1.5 0v-3zm0 4.5a.75.75 0 011.5 0v.008a.75.75 0 01-1.5 0V8.25z"/></svg>
             </div>
         </div>
 
@@ -69,7 +69,7 @@
             <div class="flex items-center justify-between p-4 border-b border-border-subtle">
                 <div>
                     <h2 class="text-base font-semibold">Live Video Feed</h2>
-                    <p class="text-xs text-text-secondary">Preview active CCTV cameras</p>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-4.5l-3.75 3v-3H6.75A2.25 2.25 0 014.5 14.25v-7.5z"/><path d="M8.25 8.25h7.5v1.5h-7.5v-1.5zm0 3h5.25v1.5H8.25v-1.5z"/></svg>
                 </div>
                 <a href="{{ route('dashboard.live_monitoring.index') }}" class="px-3 py-1.5 text-xs font-medium text-accent-blue hover:text-accent-blue-hover">View All Cameras</a>
             </div>
@@ -141,34 +141,12 @@
         </div>
     </div>
 
-    <div class="bg-dark-card border border-border-subtle rounded-xl p-5">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-base font-semibold">7-Day Recognition Activity</h2>
-                <p class="text-xs text-text-secondary">Daily recognized vs unknown detections</p>
-            </div>
-            <div class="flex items-center gap-4 text-xs">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-accent-blue"></span>
-                    <span class="text-text-secondary">Recognized</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-danger"></span>
-                    <span class="text-text-secondary">Unknown</span>
-                </div>
-            </div>
-        </div>
-        <div class="relative w-full h-64">
-            <canvas id="detectionChart"></canvas>
-        </div>
-    </div>
+    @include('dashboard.partials.detection-chart', ['stats' => $filledStats, 'title' => '7-Day Recognition Activity'])
 </div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const dailyStats = @json($filledStats);
-    
     // Stream clock overlay
     function updateStreamClocks() {
         const now = new Date();
@@ -178,66 +156,6 @@
     setInterval(updateStreamClocks, 1000);
     updateStreamClocks();
     
-    const ctx = document.getElementById('detectionChart').getContext('2d');
-    
-    const labels = dailyStats.map(d => {
-        const date = new Date(d.date);
-        return date.toLocaleDateString('en-US', { weekday: 'short' });
-    });
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Recognized',
-                    data: dailyStats.map(d => d.recognized),
-                    borderColor: '#2563EB',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                },
-                {
-                    label: 'Unknown',
-                    data: dailyStats.map(d => d.unknown),
-                    borderColor: '#EF4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        color: '#94a3b8',
-                        font: { size: 11 },
-                        usePointStyle: true,
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#64748b', font: { size: 10 } }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(255,255,255,0.06)' },
-                    ticks: { color: '#64748b', font: { size: 10 } }
-                }
-            }
-        }
-    });
 </script>
 @endpush
 @endsection
