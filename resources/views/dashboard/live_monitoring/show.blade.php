@@ -185,8 +185,8 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Poll snapshot every 500ms for near-realtime playback
-    setInterval(loadStream, 500);
+    // Poll snapshot every 800ms for near-realtime playback (lighter than 500ms)
+    setInterval(loadStream, 800);
 
     // Auto-retry when offline
     setInterval(() => {
