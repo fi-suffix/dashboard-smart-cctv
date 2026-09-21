@@ -60,6 +60,41 @@ class CameraController extends Controller
         return view('dashboard.camera.show', compact('camera'));
     }
 
+    public function testConnection(Request $request)
+    {
+        $request->validate([
+            'rtsp_url' => 'required|string|max:500',
+            'username' => 'nullable|string|max:100',
+            'password' => 'nullable|string|max:100',
+        ]);
+
+        $pythonUrl = rtrim(env('PYTHON_SERVICE_URL', 'http://localhost:8001'), '/');
+
+        try {
+            $response = Http::timeout(25)->post($pythonUrl . '/test-rtsp', [
+                'rtsp_url' => $request->input('rtsp_url'),
+                'username' => $request->input('username'),
+                'password' => $request->input('password'),
+            ]);
+
+            $data = $response->json();
+
+            if ($response->successful() && is_array($data)) {
+                return response()->json($data);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Python service error (HTTP ' . $response->status() . ')',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Service Python tidak dapat dihubungi. Pastikan sudah berjalan di ' . $pythonUrl,
+            ]);
+        }
+    }
+
     public function edit(Camera $camera): View
     {
         return view('dashboard.camera.edit', compact('camera'));

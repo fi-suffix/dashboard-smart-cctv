@@ -34,6 +34,7 @@ Route::prefix('dashboard')->name('dashboard.')->middleware('auth')->group(functi
     Route::resource('employee', EmployeeController::class)->except(['show']);
 
     Route::resource('camera', CameraController::class)->except(['show']);
+    Route::post('camera/test-connection', [CameraController::class, 'testConnection'])->name('camera.test-connection');
     Route::post('camera/{camera}/toggle-status', [CameraController::class, 'toggleStatus'])->name('camera.toggle-status');
 
     Route::resource('admin', AdminUserController::class)->except(['show']);
