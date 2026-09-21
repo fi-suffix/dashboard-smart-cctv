@@ -55,16 +55,16 @@
             <div>
                 <label for="status" class="block text-sm font-medium mb-1.5">Status</label>
                 <select id="status" name="status" required class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
-                    <option value="active" @selected(old('status', 'active') === 'active')>Active</option>
-                    <option value="inactive" @selected(old('status') === 'inactive')>Inactive</option>
-                    <option value="maintenance" @selected(old('status') === 'maintenance')>Maintenance</option>
+                    <option value="active" {{ old('status', $defaults['default_status'] ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ old('status', $defaults['default_status'] ?? 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="maintenance" {{ old('status', $defaults['default_status'] ?? 'active') === 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                 </select>
                 @error('status') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label for="reconnect_interval" class="block text-sm font-medium mb-1.5">Reconnect Interval (seconds)</label>
-                <input id="reconnect_interval" name="reconnect_interval" type="number" value="{{ old('reconnect_interval', 5) }}" min="1" max="300" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                <input id="reconnect_interval" name="reconnect_interval" type="number" value="{{ old('reconnect_interval', $defaults['reconnect_interval'] ?? 5) }}" min="1" max="300" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
                 @error('reconnect_interval') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
             </div>
         </div>

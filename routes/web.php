@@ -47,6 +47,7 @@ Route::prefix('dashboard')->name('dashboard.')->middleware('auth')->group(functi
     Route::get('detection_history/{detectionLog}', [DetectionLogController::class, 'show'])->name('detection_history.show');
 
     Route::get('setting', [SettingsController::class, 'index'])->name('setting.index');
+    Route::post('setting', [SettingsController::class, 'save'])->name('setting.save');
     Route::post('setting/cleanup', [SettingsController::class, 'cleanup'])->name('setting.cleanup');
 });
 
