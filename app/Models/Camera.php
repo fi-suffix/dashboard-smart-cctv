@@ -13,8 +13,11 @@ class Camera extends Model
     protected $fillable = [
         'name',
         'rtsp_url',
+        'rtsp_url_main',
+        'rtsp_url_sub',
         'location',
         'status',
+        'recognition_enabled',
         'username',
         'password',
         'reconnect_interval',
@@ -22,6 +25,7 @@ class Camera extends Model
     ];
 
     protected $casts = [
+        'recognition_enabled' => 'boolean',
         'reconnect_interval' => 'integer',
         'last_connected_at' => 'datetime',
     ];
@@ -34,6 +38,16 @@ class Camera extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function getEffectiveMainUrlAttribute(): string
+    {
+        return $this->rtsp_url_main ?: $this->rtsp_url;
+    }
+
+    public function getEffectiveSubUrlAttribute(): string
+    {
+        return $this->rtsp_url_sub ?: $this->rtsp_url;
     }
 
     public function getStatusBadgeClassAttribute(): string

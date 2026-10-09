@@ -21,5 +21,6 @@ class SettingSeeder extends Seeder
         // API Integration (synced from .env)
         Setting::setValue('api_integration.python_service_url', env('PYTHON_SERVICE_URL', 'http://localhost:8001'), 'string', 'api_integration', 'Python Service URL', 'Base URL of the Python FastAPI service');
         Setting::setValue('api_integration.api_key', env('FACE_RECOGNITION_API_KEY', 'your-secret-api-key-here'), 'string', 'api_integration', 'API Key', 'API key for Python service authentication');
+        Setting::setValue('api_integration.internal_token', env('AI_INTERNAL_TOKEN', ''), 'string', 'api_integration', 'Internal Token', 'Shared secret for the internal recognition-events ingestion endpoint (X-Internal-Token)');
     }
 }

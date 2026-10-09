@@ -158,8 +158,8 @@
             <div class="pt-4 border-t border-border-subtle">
                 <div class="flex justify-between items-center mb-4 text-xs">
                     <span class="text-text-secondary">Model Verification</span>
-                    <span class="text-emerald-500 font-medium flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Ready for processing
+                    <span class="text-success font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-success"></span> Ready for processing
                     </span>
                 </div>
 

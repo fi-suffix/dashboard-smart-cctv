@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\ApiKeyAuth;
+use App\Http\Middleware\InternalTokenAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,12 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'api.key' => \App\Http\Middleware\ApiKeyAuth::class,
+            'api.key' => ApiKeyAuth::class,
+            'internal.token' => InternalTokenAuth::class,
         ]);
-        
+
         // Exclude API routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'api/face-recognition/*',
+            'api/internal/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

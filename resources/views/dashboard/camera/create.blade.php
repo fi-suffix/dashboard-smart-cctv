@@ -81,6 +81,16 @@
             </div>
         </div>
 
+        <div>
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                <input id="recognition_enabled" name="recognition_enabled" type="checkbox" value="1" {{ old('recognition_enabled') ? 'checked' : '' }} class="mt-0.5 w-4 h-4 rounded border-border-subtle bg-dark-elevated accent-accent-blue">
+                <span>
+                    <span class="block text-sm font-medium">Face Recognition</span>
+                    <span class="block text-xs text-text-secondary">Aktifkan AI pengenalan wajah di kamera ini (menghasilkan events + notifikasi unknown). Hanya kamera pintu/reception yang perlu nyala.</span>
+                </span>
+            </label>
+        </div>
+
         <div class="flex items-center justify-end gap-3 pt-2">
             <a href="{{ route('dashboard.camera.index') }}" class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary">Cancel</a>
             <button type="submit" class="px-4 py-2 rounded-lg bg-accent-blue hover:bg-accent-blue-hover text-white text-sm font-medium transition-colors">Save Camera</button>

@@ -7,21 +7,23 @@ use App\Models\Camera;
 use App\Models\DetectionLog;
 use App\Models\Employee;
 use App\Models\EmployeePhoto;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class FaceRecognitionController extends Controller
 {
     public function cameras(): JsonResponse
     {
-        $cameras = Camera::select('id', 'name', 'rtsp_url', 'location', 'status')->get();
+        $cameras = Camera::select('id', 'name', 'rtsp_url', 'location', 'status', 'recognition_enabled')->get();
+
         return response()->json(['cameras' => $cameras]);
     }
 
     public function camera(int $id): JsonResponse
     {
         $camera = Camera::findOrFail($id);
+
         return response()->json(['camera' => $camera]);
     }
 

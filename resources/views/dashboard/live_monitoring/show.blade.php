@@ -14,15 +14,15 @@
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard.live_monitoring.index') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-dark-card border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent-blue/40 transition-colors">
+            <a href="{{ route('dashboard.live_monitoring.index') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-dark-elevated border border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent-blue/40 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
             </a>
             <div>
-                <h2 class="text-base font-semibold">{{ $camera->name }}</h2>
+                <h2 class="text-base font-semibold text-text-primary">{{ $camera->name }}</h2>
                 <p class="text-xs text-text-secondary">{{ $camera->location }}</p>
             </div>
         </div>
-        <span id="stream-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-text-secondary/10 border border-border-subtle text-text-secondary text-xs font-medium w-fit">
+        <span id="stream-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-dark-elevated border border-border-subtle text-text-secondary text-xs font-medium w-fit">
             <span id="stream-status-dot" class="w-1.5 h-1.5 rounded-full bg-text-secondary"></span>
             <span id="stream-status-text">Connecting...</span>
         </span>
@@ -40,7 +40,7 @@
                 <div class="text-center space-y-3">
                     <svg class="w-12 h-12 mx-auto text-text-secondary opacity-40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/></svg>
                     <p class="text-sm text-text-secondary">Unable to load stream</p>
-                    <button onclick="reloadStream()" class="px-3 py-1.5 bg-accent-blue hover:bg-accent-blue-hover text-white text-xs font-medium rounded-lg transition-colors">Retry</button>
+                    <button onclick="reloadStream()" class="px-3 py-1.5 bg-accent-blue hover:bg-accent-blue-hover text-text-primary text-xs font-medium rounded-lg transition-colors">Retry</button>
                 </div>
             </div>
 
@@ -59,10 +59,10 @@
         <div class="lg:col-span-2 bg-dark-card border border-border-subtle rounded-xl overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-border-subtle">
                 <div>
-                    <h3 class="text-sm font-semibold">Recent Detections</h3>
+                    <h3 class="text-sm font-semibold text-text-primary">Recent Detections</h3>
                     <p class="text-xs text-text-secondary">Latest activity on this camera</p>
                 </div>
-                <a href="{{ route('dashboard.detection_history.index', ['camera_id' => $camera->id]) }}" class="text-xs font-medium text-accent-blue hover:text-accent-blue-hover hover:underline">
+                <a href="{{ route('dashboard.detection_history.index', ['camera_id' => $camera->id]) }}" class="text-xs font-medium text-accent-blue hover:text-accent-blue/80 hover:underline">
                     View all
                 </a>
             </div>
@@ -77,7 +77,7 @@
                             @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium truncate">
+                            <p class="text-sm font-medium text-text-primary truncate">
                                 @if ($detection->employee_id)
                                     {{ $detection->employee_name }}
                                 @else
@@ -86,7 +86,7 @@
                             </p>
                             <p class="text-xs text-text-secondary">{{ $detection->detected_at->diffForHumans() }}</p>
                         </div>
-                        <span class="inline-flex px-2 py-0.5 rounded-full {{ $detection->status_badge_class }} text-xs font-medium shrink-0">{{ $detection->status_label }}</span>
+                        <span class="inline-flex px-2 py-0.5 rounded {{ $detection->status_badge_class }} text-xs font-medium shrink-0">{{ $detection->status_label }}</span>
                         <span class="text-sm font-semibold {{ $detection->status === 'recognized' ? 'text-success' : 'text-text-secondary' }} shrink-0">{{ $detection->confidence_percentage }}</span>
                     </a>
                 @empty
@@ -96,15 +96,15 @@
         </div>
 
         <div class="bg-dark-card border border-border-subtle rounded-xl p-5 h-fit">
-            <h3 class="text-sm font-semibold mb-4">Camera Details</h3>
+            <h3 class="text-sm font-semibold text-text-primary mb-4">Camera Details</h3>
             <dl class="space-y-3 text-sm">
                 <div class="flex items-start justify-between gap-3">
                     <dt class="text-text-secondary shrink-0">Location</dt>
-                    <dd class="font-medium text-right">{{ $camera->location ?: '—' }}</dd>
+                    <dd class="font-medium text-right text-text-primary">{{ $camera->location ?: '—' }}</dd>
                 </div>
                 <div class="flex items-start justify-between gap-3">
                     <dt class="text-text-secondary shrink-0">Status</dt>
-                    <dd><span class="inline-flex px-2 py-0.5 rounded-full {{ $camera->status_badge_class }} text-xs font-medium">{{ $camera->status_label }}</span></dd>
+                    <dd><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $camera->status_badge_class }}">{{ $camera->status_label }}</span></dd>
                 </div>
                 <div class="flex items-start justify-between gap-3">
                     <dt class="text-text-secondary shrink-0">RTSP URL</dt>
@@ -112,16 +112,16 @@
                 </div>
                 <div class="flex items-start justify-between gap-3">
                     <dt class="text-text-secondary shrink-0">Reconnect</dt>
-                    <dd class="font-medium text-right">{{ $camera->reconnect_interval }} seconds</dd>
+                    <dd class="font-medium text-right text-text-primary">{{ $camera->reconnect_interval }} seconds</dd>
                 </div>
                 <div class="flex items-start justify-between gap-3">
                     <dt class="text-text-secondary shrink-0">Last Connected</dt>
-                    <dd class="font-medium text-right">{{ $camera->last_connected_at ? $camera->last_connected_at->diffForHumans() : 'Never' }}</dd>
+                    <dd class="font-medium text-right text-text-primary">{{ $camera->last_connected_at ? $camera->last_connected_at->diffForHumans() : 'Never' }}</dd>
                 </div>
             </dl>
 
             <div class="mt-4 pt-4 border-t border-border-subtle">
-                <a href="{{ route('dashboard.camera.edit', $camera) }}" class="w-full px-4 py-2 text-center text-sm font-medium text-text-secondary hover:text-text-primary bg-dark-elevated/50 border border-border-subtle rounded-lg transition-colors block">
+                <a href="{{ route('dashboard.camera.edit', $camera) }}" class="w-full px-4 py-2 text-center text-sm font-medium text-text-secondary hover:text-text-primary bg-dark-elevated border border-border-subtle rounded-lg transition-colors block">
                     Edit Camera Settings
                 </a>
             </div>
@@ -164,11 +164,11 @@
         if (state === 'online') {
             dot.className = 'w-1.5 h-1.5 rounded-full bg-success animate-pulse';
             text.textContent = 'LIVE';
-            badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 border border-success/20 text-success text-xs font-medium w-fit';
+            badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/20 border border-success/30 text-success text-xs font-medium w-fit';
         } else {
             dot.className = 'w-1.5 h-1.5 rounded-full bg-danger';
             text.textContent = 'OFFLINE';
-            badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-danger/10 border border-danger/20 text-danger text-xs font-medium w-fit';
+            badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-danger/20 border border-danger/30 text-danger text-xs font-medium w-fit';
         }
     }
 
