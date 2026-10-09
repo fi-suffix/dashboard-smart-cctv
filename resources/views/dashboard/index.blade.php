@@ -69,7 +69,7 @@
             <div class="flex items-center justify-between p-4 border-b border-border-subtle">
                 <div>
                     <h2 class="text-base font-semibold">Live Video Feed</h2>
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 6.75A2.25 2.25 0 016.75 4.5h10.5a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-4.5l-3.75 3v-3H6.75A2.25 2.25 0 014.5 14.25v-7.5z"/><path d="M8.25 8.25h7.5v1.5h-7.5v-1.5zm0 3h5.25v1.5H8.25v-1.5z"/></svg>
+                    <p class="text-xs text-text-secondary">Click on a camera to view full-screen live feed</p>
                 </div>
                 <a href="{{ route('dashboard.live_monitoring.index') }}" class="px-3 py-1.5 text-xs font-medium text-accent-blue hover:text-accent-blue-hover">View All Cameras</a>
             </div>

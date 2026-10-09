@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camera;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -15,16 +16,20 @@ class CameraController extends Controller
     {
         return view('dashboard.camera.index', [
             'cameras' => Camera::query()->latest()->get(),
+            'pythonServiceUrl' => rtrim(Setting::getValue('api_integration.python_service_url', config('services.python.url', 'http://localhost:8001')), '/'),
         ]);
     }
 
     public function create(): View
     {
-        return view('dashboard.camera.create');
+        $defaults = Setting::getGroup('camera_defaults');
+
+        return view('dashboard.camera.create', compact('defaults'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $defaults = Setting::getGroup('camera_defaults');
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'rtsp_url' => 'required|string|max:500',
@@ -33,16 +38,18 @@ class CameraController extends Controller
             'username' => 'nullable|string|max:100',
             'password' => 'nullable|string|max:100',
             'reconnect_interval' => 'nullable|integer|min:1|max:300',
+            'recognition_enabled' => 'sometimes|boolean',
         ]);
 
         $camera = Camera::create([
             'name' => $validated['name'],
             'rtsp_url' => $validated['rtsp_url'],
             'location' => $validated['location'],
-            'status' => $validated['status'],
+            'status' => $validated['status'] ?? $defaults['default_status'] ?? 'active',
+            'recognition_enabled' => $request->boolean('recognition_enabled'),
             'username' => $validated['username'] ?? null,
             'password' => $validated['password'] ?? null,
-            'reconnect_interval' => $validated['reconnect_interval'] ?? 5,
+            'reconnect_interval' => $validated['reconnect_interval'] ?? $defaults['reconnect_interval'] ?? 5,
         ]);
 
         if ($camera->status === 'active') {
@@ -68,7 +75,7 @@ class CameraController extends Controller
         $pythonUrl = rtrim(env('PYTHON_SERVICE_URL', 'http://localhost:8001'), '/');
 
         try {
-            $response = Http::timeout(25)->post($pythonUrl . '/test-rtsp', [
+            $response = Http::timeout(25)->post($pythonUrl.'/test-rtsp', [
                 'rtsp_url' => $request->input('rtsp_url'),
                 'username' => $request->input('username'),
                 'password' => $request->input('password'),
@@ -82,12 +89,12 @@ class CameraController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Python service error (HTTP ' . $response->status() . ')',
+                'message' => 'Python service error (HTTP '.$response->status().')',
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Service Python tidak dapat dihubungi. Pastikan sudah berjalan di ' . $pythonUrl,
+                'message' => 'Service Python tidak dapat dihubungi. Pastikan sudah berjalan di '.$pythonUrl,
             ]);
         }
     }
@@ -107,6 +114,7 @@ class CameraController extends Controller
             'username' => 'nullable|string|max:100',
             'password' => 'nullable|string|max:100',
             'reconnect_interval' => 'nullable|integer|min:1|max:300',
+            'recognition_enabled' => 'sometimes|boolean',
         ]);
 
         // Keep current password if blank
@@ -114,7 +122,9 @@ class CameraController extends Controller
             unset($validated['password']);
         }
 
-        $camera->update($validated);
+        $camera->update(array_merge($validated, [
+            'recognition_enabled' => $request->boolean('recognition_enabled'),
+        ]));
 
         // Restart stream so new config is applied
         $this->notifyPython('stop', $camera->id);
@@ -152,7 +162,7 @@ class CameraController extends Controller
     private function notifyPython(string $action, int $cameraId): void
     {
         try {
-            $base = rtrim(env('PYTHON_SERVICE_URL', 'http://localhost:8001'), '/');
+            $base = rtrim(Setting::getValue('api_integration.python_service_url', env('PYTHON_SERVICE_URL', 'http://localhost:8001')), '/');
             Http::timeout(3)->post("{$base}/cameras/{$cameraId}/{$action}");
         } catch (\Throwable $e) {
             logger()->warning('Failed to notify Python service: '.$e->getMessage());

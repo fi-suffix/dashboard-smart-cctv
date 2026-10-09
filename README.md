@@ -125,6 +125,65 @@ Implementasi: `SettingsController@index` dan `@cleanup` (`POST /dashboard/settin
 - `/dashboard/admin` — kelola akun admin
 - `/dashboard/setting` — settings & cleanup storage
 
+## go2rtc (restream video via WebRTC/MSE)
+
+Video live ditayangkan lewat **go2rtc** (`D:\PKL-project\go2rtc`) agar browser bisa memutar RTSP (H.264/H.265) tanpa decode CPU — jalur video terpisah dari service Python/AI.
+
+Perubahan di DB kamera (migrasi `add_rtsp_sub_main_to_cameras_table`) menambah dua kolom:
+
+- `rtsp_url_main` — URL substream utama (bila kosong, fallback ke `rtsp_url`)
+- `rtsp_url_sub` — URL substream tambahan/grid (bila kosong, fallback ke `rtsp_url`)
+
+Aksesor model: `Camera::effective_main_url` / `effective_sub_url`. Naming dua stream per kamera: `cam{ID}_main` dan `cam{ID}_sub`.
+
+### Setup singkat (sekali ini)
+
+```powershell
+php artisan go2rtc:sync          # tulis D:\PKL-project\go2rtc\go2rtc.yaml dari tabel cameras
+D:\PKL-project\go2rtc\start-go2rtc.bat   # jalankan go2rtc (WebUI http://<LAN-IP>:1984)
+```
+
+- Jalankan ulang `go2rtc:sync` setelah ubah tabel `cameras` atau `.env` variabel `GO2RTC_*`.
+- Variabel `.env`: `GO2RTC_HOST` (auto-detect bila kosong), `GO2RTC_API_PORT=1984`, `GO2RTC_RTSP_PORT=8554`, `GO2RTC_WEBRTC_PORT=8555`, `GO2RTC_CONFIG_PATH=../go2rtc/go2rtc.yaml`.
+- RTSP restream lokal `rtsp://127.0.0.1:8554/cam{ID}_sub` bisa dipakai pekerja AI bila ingin sumber stream diambil dari go2rtc.
+- Firewall: inbound TCP/UDP untuk `go2rtc.exe` sudah dibuat otomatis.
+
+### Catatan keamanan
+
+- `go2rtc.yaml` memuat URL RTSP **beserta kredensial kamera** → file ini **TIDAK boleh di-commit** (sudah di `.gitignore`).
+- WebUI/API go2rtc di `:1984` terbuka di LAN. Set `GO2RTC_API_USERNAME`/`GO2RTC_API_PASSWORD` di `.env` untuk Basic Auth, atau proxy `/api` lewat Laravel (TODO). Jalankan `go2rtc:sync` ulang setelah menambah kredensial.
+- `rtsp.listen` sengaja dibatasi `127.0.0.1:8554` agar restream internal tidak terekspos ke jaringan.
+
+## Recognition Events (Phase 2)
+
+Peristiwa pengenalan wajah (known/unknown) disimpan di tabel `recognition_events`
+(uuid idempoten, camera_id, employee_id nullable, type, similarity, track_id,
+snapshot_path, bbox, occurred_at UTC). Objek terkait: `RecognitionEvent`.
+
+### Ingest dari service Python
+
+Contoh `curl` (multipart, JSON-fields + file JPEG opsional):
+
+```bash
+curl -X POST http://localhost:8000/api/internal/recognition-events \
+  -H "X-Internal-Token: dev-internal-token-2026" \
+  -F "event_uuid=3f7d0c4e-a1b2-4c3d-9e8f-000000000001" \
+  -F "camera_id=17" \
+  -F "type=known" \
+  -F "employee_id=9" \
+  -F "similarity=0.618" \
+  -F "track_id=cam17-track-1" \
+  -F "bbox[]=10" -F "bbox[]=20" -F "bbox[]=60" -F "bbox[]=80" \
+  -F "occurred_at=2026-09-21T05:00:00Z" \
+  -F "snapshot=@snapshot.jpg"
+```
+
+- Respon `201` (baru) atau `200` + `"duplicate":true` (event_uuid yang sama tidak ganda).
+- Token di header `X-Internal-Token` = `.env` `AI_INTERNAL_TOKEN` (constant-time compare,
+  middleware `internal.token`). Rate limit internal: 120/menit (`throttle:internal-events`).
+- Snapshot disimpan di `storage/app/public/events/{Y}/{m}/{d}/` (folder ini tidak ikut git)
+  dan hanya bisa diakses lewat route terautentikasi `GET /dashboard/recognition_events/{event}/snapshot`.
+
 ## Struktur penting
 
 ```

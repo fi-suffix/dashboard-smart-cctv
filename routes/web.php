@@ -1,13 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\EmergencyEventController;
 use App\Http\Controllers\Api\FaceRecognitionController;
+use App\Http\Controllers\Api\RecognitionEventController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\AdminUserController;
 use App\Http\Controllers\Dashboard\CameraController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\DetectionLogController;
 use App\Http\Controllers\Dashboard\EmployeeController;
+use App\Http\Controllers\Dashboard\EmergencyEventController as DashboardEmergencyEventController;
 use App\Http\Controllers\Dashboard\LiveMonitoringController;
+use App\Http\Controllers\Dashboard\RecognitionEventController as DashboardRecognitionEventController;
 use App\Http\Controllers\Dashboard\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,7 +51,25 @@ Route::prefix('dashboard')->name('dashboard.')->middleware('auth')->group(functi
     Route::get('detection_history/{detectionLog}', [DetectionLogController::class, 'show'])->name('detection_history.show');
 
     Route::get('setting', [SettingsController::class, 'index'])->name('setting.index');
+    Route::post('setting', [SettingsController::class, 'save'])->name('setting.save');
     Route::post('setting/cleanup', [SettingsController::class, 'cleanup'])->name('setting.cleanup');
+
+    Route::get('recognition_events/{recognitionEvent}/snapshot', [DashboardRecognitionEventController::class, 'snapshot'])
+        ->name('recognition_events.snapshot');
+
+    // Emergency Events Routes
+    Route::get('emergency', [DashboardEmergencyEventController::class, 'index'])->name('emergency.index');
+    Route::get('emergency/{emergencyEvent}', [DashboardEmergencyEventController::class, 'show'])->name('emergency.show');
+    Route::post('emergency/{emergencyEvent}/acknowledge', [DashboardEmergencyEventController::class, 'acknowledge'])->name('emergency.acknowledge');
+    Route::post('emergency/{emergencyEvent}/resolve', [DashboardEmergencyEventController::class, 'resolve'])->name('emergency.resolve');
+    Route::post('emergency/acknowledge-all', [DashboardEmergencyEventController::class, 'acknowledgeAll'])->name('emergency.acknowledge-all');
+    Route::get('emergency/{emergencyEvent}/snapshot', [DashboardEmergencyEventController::class, 'snapshot'])->name('emergency.snapshot');
+});
+
+// Internal API for the Python AI service (protected by X-Internal-Token)
+Route::prefix('api/internal')->middleware(['internal.token', 'throttle:internal-events'])->group(function () {
+    Route::post('recognition-events', [RecognitionEventController::class, 'store']);
+    Route::post('emergency-events', [EmergencyEventController::class, 'store']);
 });
 
 // API routes for Python service (protected by API key)

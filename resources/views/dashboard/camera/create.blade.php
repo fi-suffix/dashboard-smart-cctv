@@ -55,16 +55,16 @@
             <div>
                 <label for="status" class="block text-sm font-medium mb-1.5">Status</label>
                 <select id="status" name="status" required class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
-                    <option value="active" @selected(old('status', 'active') === 'active')>Active</option>
-                    <option value="inactive" @selected(old('status') === 'inactive')>Inactive</option>
-                    <option value="maintenance" @selected(old('status') === 'maintenance')>Maintenance</option>
+                    <option value="active" {{ old('status', $defaults['default_status'] ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ old('status', $defaults['default_status'] ?? 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="maintenance" {{ old('status', $defaults['default_status'] ?? 'active') === 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                 </select>
                 @error('status') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label for="reconnect_interval" class="block text-sm font-medium mb-1.5">Reconnect Interval (seconds)</label>
-                <input id="reconnect_interval" name="reconnect_interval" type="number" value="{{ old('reconnect_interval', 5) }}" min="1" max="300" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
+                <input id="reconnect_interval" name="reconnect_interval" type="number" value="{{ old('reconnect_interval', $defaults['reconnect_interval'] ?? 5) }}" min="1" max="300" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
                 @error('reconnect_interval') <p class="mt-1 text-xs text-danger">{{ $message }}</p> @enderror
             </div>
         </div>
@@ -79,6 +79,16 @@
                 <label for="password" class="block text-sm font-medium mb-1.5">Password (Optional)</label>
                 <input id="password" name="password" type="password" value="{{ old('password') }}" placeholder="••••••••" class="w-full rounded-lg border border-border-subtle bg-dark-elevated px-3.5 py-2.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none">
             </div>
+        </div>
+
+        <div>
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                <input id="recognition_enabled" name="recognition_enabled" type="checkbox" value="1" {{ old('recognition_enabled') ? 'checked' : '' }} class="mt-0.5 w-4 h-4 rounded border-border-subtle bg-dark-elevated accent-accent-blue">
+                <span>
+                    <span class="block text-sm font-medium">Face Recognition</span>
+                    <span class="block text-xs text-text-secondary">Aktifkan AI pengenalan wajah di kamera ini (menghasilkan events + notifikasi unknown). Hanya kamera pintu/reception yang perlu nyala.</span>
+                </span>
+            </label>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-2">

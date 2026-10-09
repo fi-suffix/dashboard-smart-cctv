@@ -7,14 +7,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ApiKeyAuth
+class InternalTokenAuth
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $apiKey = $request->header('Authorization');
-        $expectedKey = 'Bearer ' . Setting::getValue('api_integration.api_key', config('app.face_recognition_api_key', env('FACE_RECOGNITION_API_KEY')));
-        
-        if (!$apiKey || $apiKey !== $expectedKey) {
+        $provided = trim((string) $request->header('X-Internal-Token', ''));
+        $expected = (string) Setting::getValue(
+            'api_integration.internal_token',
+            env('AI_INTERNAL_TOKEN', '')
+        );
+
+        if ($expected === '' || ! hash_equals($expected, $provided)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
